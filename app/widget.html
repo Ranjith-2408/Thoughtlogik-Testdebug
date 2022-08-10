@@ -8,6 +8,8 @@
    <script type="text/javascript" src=" https://js.zohostatic.com/creator/widgets/version/1.0/widgetsdk-min.js"></script>
    <!-- JavaScript Bundle with Popper -->
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+<!--AJAX-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <style>
   body{
     background-color: antiquewhite;
@@ -40,8 +42,8 @@
 {
     background:Orgba(0,0,0,0.6);
    width:100%;
-    height:100%;
-    margin-top:10%;
+    height:80%;
+    margin-top:5%;
    position:absolute;
    top:0;
    display:none;
@@ -66,7 +68,7 @@ input{
     margin-left: 100px;
     display:block;
     width:50%;
-    padding: 8px;
+    padding: 4px;
     border: 1px Solid grey;
 }
 #sbutton{
@@ -78,7 +80,7 @@ input{
      font-size:18px;
     border-radius:20px;
     box-shadow:6px 6px 29px -4px rgba(0,0,0,0.75);
-    margin-top:50px;
+    margin-top :12px;
     text-decoration:none;
     transition:0.4s;
  }
@@ -88,7 +90,7 @@ input{
  }
 .close-btn{
     position: absolute;
-    top:-10px;
+    top:-80px;
     right:500px;
     background: rgb(9, 9, 9);
     color: #fff;
@@ -112,8 +114,8 @@ input{
         <div class="popup-content">
             <div class="form-content">
                 <label for="Student_id">Student ID</label>
-                <select id="Student_id"></select>
-               <!-- <input type="Number" id="Student_id" placeholder="Enter Student ID">-->
+                <select id="Student_id" ></select>
+                <!--onchange="myFunction()"-->
             </div><br>
             <div class="form-content">
             <label for="Student_Name">Student Name</label>
@@ -129,16 +131,20 @@ input{
           <!--  <input type="Number" id="Book_id" placeholder="Enter Book ID">  -->
         </div><br>
         <div class="form-content">
-            <label for="Book_Name">Book Name</label>
-            <input type="text" id="Book_Name" placeholder="Enter Book_Name">
-        </div>
-         <div class="form-content">
-                    <label for="Aldate">Allocation Date</label>
-            <input type="date" id="Aldate" placeholder="Enter Allocation date">
+            <label for="Bookname">Book Name</label>
+            <input type="text" id="Bookname" placeholder="Enter Book_Name">
         </div>
         <div class="form-content">
+          <label for="Author_name">Author Name</label>
+          <input type="text" id="authorname" placeholder="Enter Author_Name">
+      </div>
+         <div class="form-content">
+            <label for="Aldate">Allocation Date</label>
+            <input type="date"  id="Aldate"  placeholder="Enter Allocation date">
+        </div>
+        <div class="form-content" >
             <label for="ddate">Due Date</label>
-            <input type="date" id="ddate" placeholder="Enter Due Date">
+            <input type="date"  id="ddate" placeholder="Enter Due Date">
         </div>
             <button id="sbutton"> Submit </button>
         </div>
@@ -149,10 +155,22 @@ input{
       document.getElementById("button").addEventListener("click",function(){
       document.querySelector(".popup").style.display="flex";
        })
-      
+      //  function myFunction(){
+      //     var studauto=$("#Student_id").val();
+      //     console.log(studauto); 
+          
+      //   //   $("#Bookname").append(studauto);
+      //   //  var test=$("#Bookname").val();
+      //   //   console.log(test);
+          
+      //   }
+        //   $("Student_id").click(function(){
+        //           //var studauto=$("#Student_id").val();
+        //  console.log('hii');
+        // }); 
       $(document).ready(function(){
          ZOHO.CREATOR.init()
-        .then(function(data) {
+        .then(function(data) {        
           con = {
           appName : "new-library-management",
 	        reportName : "All_Students"  
@@ -162,45 +180,104 @@ input{
 	        reportName : "All_Books"  
 }
 //get all records API
-ZOHO.CREATOR.API.getAllRecords(con).then(function(response){
+       ZOHO.CREATOR.API.getAllRecords(con).then(function(response){
             var recordArr = response.data;
             for(var index in recordArr){
               let cat = recordArr[index].Roll_No;
+              let record_id = recordArr[index].ID;
               $("#Student_id").append($("<option>",
                 {
-                  value:cat,
+                  value:record_id,
                   text:cat
                 }));
-
-              console.log(recordArr[index]);
-            }	
+                console.log(cat);
+               $("#Student_id").on('change',function(){
+                  var studauto=$("#Student_id").val();
+                  console.log(studauto); 
+                $.ajax({
+                  url:'https://creatorapp.zoho.in/ranjith24/new-library-management/#Page:test',
+                  type: 'POST',  // http method
+                  data: {ID:studauto},  // data to submit
+                success: function (data, status, xhr) {
+                $('#StudentName').val(data.Student_Name),
+                $('#Emaill').val(data.Email);
+                    //  console.log(test)
+                },
+                error: function (jqXhr, textStatus, errorMessage) {
+                console.log('Error!')
+                  // $('p').append('Error' + errorMessage);
+            }
+       });
+            });
+          }
 
 });
 ZOHO.CREATOR.API.getAllRecords(bkid).then(function(response){
             var recordArr = response.data;
             for(var index in recordArr){
               let ca = recordArr[index].Book_ID;
+              let rec_id=recordArr[index].ID;
               $("#Book_id").append($("<option>",
                 {
                   value:ca,
                   text:ca
                 }));
-
-              console.log(recordArr[index]);
+                console.log(recordArr[index]);
+             
             }	
 
-});
-/*
+   });
+         $("#sbutton").click(function(){
+          var studentid=$("#Student_id").val();
+          var studentname=$("#StudentName").val();
+          var email=$("#Emaill").val();
+          var bookid=$("#Book_id").val();
+          var bookname=$("#Bookname").val();
+          var Authorname=$("#authorname").val();
+          var Allocationdate=$("#Aldate").val();
+          var Duedate = $("#ddate").val();
+           formData={
+            "data":{
+             "Roll_No":studentid,
+             "Student_Name": {
+               "first_name":studentname
+                },
+              "Email":email,
+              "Book_ID":bookid,
+              "Book_Name":bookname,
+              "Author_Name":Authorname,
+              "Allocation_Date":Allocationdate,
+              "Due_Date": Duedate
+            }
+          };
+          var config={
+          appName : "new-library-management",
+          formName : "Book_Allocation", 
+          data : formData 
+          };
+        ZOHO.CREATOR.API.addRecord(config).then(function(response){ 
+         	if(response.code == 3000){
+	        console.log("Record added successfully");
+	          }
+            });
+           // location.reload();
+          });
+        });
+      });
+    //   document.querySelector(".close-btn").addEventListener("click",function(){
+    //  document.querySelector(".popup").style.display="none";
+    //   })
+      // document.querySelector(".sbutton").addEventListener("click",function(){
+      // document.querySelector(".popup").style.display="none";
+      //  })
+   /*
 ZOHO.CREATOR.API.getAllRecords(con).then(function(response){
             var recordArr = response.data;
             var nam=$("#Studentid").val();
             for(var index in recordArr){
               if(nam == recordArr[index].Roll_No){
-              $("#Email").append($("<option>",
-                {
-                  value:recordArr[index].Email,
-                  text:recordArr[index].Email
-                }));
+               var em= recordArr[index].Email;
+              $("#Email").append(em);
               $("#Rollno").append($("<option>",
                 {
                   value:recordArr[index].Roll_No,
@@ -232,44 +309,16 @@ ZOHO.CREATOR.API.getAllRecords(bkid).then(function(response){
 
 });
 */
-         $("#sbutton").click(function(){
-          var rl=$("#Student_id").val();
-          // var pd=$("#StudentName").val();
-          // var el=$("#Emaill").val();
-          console.log(rl);
-          console.log(pd);
-          console.log(el);
-          formData={
-            "data":{
-            //  "Roll_No": rl
-          //  "Student_Name": {
-          //      "first_name": pd
-          //       },
-          //     "Email": el
-          "Allocation_Notes":"Testing API Call"
-            }
-          };
-          var config={
-          appName : "new-library-management",
-          formName : "Book_Allocation", 
-          data : formData 
-          };
-        ZOHO.CREATOR.API.addRecord(config).then(function(response){ 
-         	if(response.code == 3000){
-	        console.log("Record added successfully");
-	          }
-            });
-           // location.reload();
-          });
-        });
-      });
-    //   document.querySelector(".close-btn").addEventListener("click",function(){
-    //  document.querySelector(".popup").style.display="none";
-    //   })
-      // document.querySelector(".sbutton").addEventListener("click",function(){
-      // document.querySelector(".popup").style.display="none";
-      //  })
-
+ //  $("#button").click(function(){
+      //   const months = ["JAN", "FEB", "MAR","APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+      //   let current_datetime = new Date()
+      //   let formatted_date = current_datetime.getDate() + "-" + months[current_datetime.getMonth()] + "-" + current_datetime.getFullYear()
+      //   let duedate=(formatted_date+(5 * 86400000));
+      //   $("#Aldate").append(formatted_date);
+      //   console.log(formatted_date);
+      //   console.log(duedate);
+      //  });
+     
 </script>
   </body>
 </html>
